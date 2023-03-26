@@ -1,4 +1,9 @@
+const environment = process.env.NODE_ENV
+const envSet = require(`./env.${environment}.js`)
+
 export default {
+  env: envSet,
+
   // Global page headers: https://go.nuxtjs.dev/config-head
   head: {
     title: 'note-app',
@@ -13,6 +18,7 @@ export default {
     ],
     link: [{ rel: 'icon', type: 'image/x-icon', href: '/favicon.ico' }],
   },
+
 
   // Global CSS: https://go.nuxtjs.dev/config-css
   css: [],
@@ -32,15 +38,53 @@ export default {
   // Modules: https://go.nuxtjs.dev/config-modules
   modules: [
     // https://go.nuxtjs.dev/axios
-    '@nuxtjs/axios',
+    "@nuxtjs/axios",
+    './env.development.js',
+
+
   ],
 
   // Axios module configuration: https://go.nuxtjs.dev/config-axios
   axios: {
     // Workaround to avoid enforcing hard-coded localhost:3000: https://github.com/nuxt-community/axios-module/issues/308
-    baseURL: '/',
+    proxy: true,
+    // baseURL: 'http://localhost:3000',
   },
 
+  proxy: {
+    "/api": envSet.apiBaseUrl
+  },
   // Build Configuration: https://go.nuxtjs.dev/config-build
   build: {},
+
+  // ユーザー新規登録
+  modules: ["@nuxtjs/axios", "@nuxtjs/auth-next"],
+  //Modules: https://auth.nuxtjs.org/schemes/local
+  auth: {
+    strategies: {
+      local: {
+        token: {
+          property: "token",
+          global: true,
+          // required: true,
+          // type: 'Bearer'
+        },
+        user: {
+          property: "user",
+          // autoFetch: true
+        },
+        endpoints: {
+          login: { url: "/api/login", method: "post" },
+          logout: { url: "/api/logout", method: "post" },
+          user: { url: "/api/user", method: "get" },
+        },
+      },
+    },
+  },
+
+  publicRuntimeConfig: {
+    axios: {
+      baseURL: process.env.apiBaseUrl,
+    },
+  },
 }
