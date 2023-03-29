@@ -38,7 +38,7 @@ const nodemailer = require('nodemailer');
 // });
 
 //ユーザー登録に使う事前データ
-// 暗号化につかうキー
+//// 暗号化につかうキー
 const appKey = 'YOUR-SECRET-KEY';
 
 // //バリデーション
