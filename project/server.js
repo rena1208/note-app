@@ -1,13 +1,20 @@
-// サーバー接続時
-const express = require('express')
-const app = express()
+// .env読み込み
+require('dotenv').config()
+
+// サーバー接続時//パッケージ読み込み
+const { check, validationResult } = require('express-validator');
+const crypto = require('crypto');
+const User = require('./models').User;
+const { send } = require('process');
+const express = require('express');
+const app = express();
 const cors = require('cors')
 const session = require('express-session');
 const flash = require('connect-flash');
 const bcrypt = require('bcrypt');
 const passport = require('passport');
 const LocalStrategy = require('passport-local').Strategy;
-const User = require('./models').User;
+// const passport = require('./auth');
 
 app.get('/', function (req, res) {
     res.send('hello')
@@ -15,6 +22,19 @@ app.get('/', function (req, res) {
 app.listen(5000, function () {
     console.log('Example app listening on port http://localhost:5000!')
 })
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 // ミドルウェアの設定
 app.use(express.json());
@@ -30,19 +50,28 @@ app.use(passport.initialize());
 app.use(passport.session());
 
 
+const authMiddleware = (req, res, next) => {
+    if (req.isAuthenticated()) { // ログインしてるかチェック
 
-app.get('/register', (request, response) => {
-    res.setHeader("Access-Control-Allow-Origin", "*");
-    return res.render('/register');
+        next();
 
-});
+    } else {
 
-//パッケージ読み込み
-const { check, validationResult } = require('express-validator');
-const bcrypt = require('bcrypt');
-const crypto = require('crypto');
-const User = require('./models').User;
-const { send } = require('process');
+        res.redirect(302, '/login');
+
+    }
+};
+
+
+
+
+// app.get('/register', (request, response) => {
+//     // res.setHeader("Access-Control-Allow-Origin", "*");
+//     return response.json(200);
+
+// });
+
+
 
 //バリデーション
 // バリデーション・ルール
@@ -71,7 +100,7 @@ const registrationValidationRules = [
 
 app.post('/register', registrationValidationRules, (req, res) => {
     res.setHeader("Access-Control-Allow-Origin", "*");
-
+    console.log(req.body);
     const errors = validationResult(req);
 
     if (!errors.isEmpty()) { // バリデーション失敗
@@ -81,39 +110,38 @@ app.post('/register', registrationValidationRules, (req, res) => {
     }
 
     // 送信されたデータ
-    const name = req.name;
-    const email = req.email;
-    const password = req.password;
+    const name = req.body.name;
+    const email = req.body.email;
+    const password = req.body.password;
 
     // ユーザーデータを登録
-    User.findOrCreate({
-        where: { email: email },
-        defaults: {
-            name: name,
-            email: email,
-            password: bcrypt.hashSync(password, bcrypt.genSaltSync(8))
-        }
-    }).then(([user]) => {
+    User.create({
+        // where: { email: email },
+        name: name,
+        email: email,
+        password: bcrypt.hashSync(password, bcrypt.genSaltSync(8))
+    }
+    ).then((aaa) => {
 
-        if (user.email) { // すでに登録されている時
+        // if (user.email) { // すでに登録されている時
 
-            return res.status(422).json({
-                errors: [
-                    {
-                        value: email,
-                        msg: 'すでに登録されています。',
-                        param: 'email',
-                        location: 'body'
-                    }
-                ]
-            });
+        //     return res.status(422).json({
+        //         errors: [
+        //             {
+        //                 value: email,
+        //                 msg: 'すでに登録されています。',
+        //                 param: 'email',
+        //                 location: 'body'
+        //             }
+        //         ]
+        //     });
 
-        }
+        // }
     });
 });
 
 
-//ログイン
+// //ログイン
 // passport.use(new LocalStrategy({
 //     usernameField: 'email',
 //     passwordField: 'password'
@@ -142,6 +170,44 @@ app.post('/register', registrationValidationRules, (req, res) => {
 //         });
 
 // }));
+
+// // Session
+// passport.serializeUser((user, done) => {
+
+//     done(null, user);
+
+// });
+// passport.deserializeUser((user, done) => {
+
+//     done(null, user);
+
+// });
+
+// module.exports = passport;
+
+// // ログインフォーム
+// app.get('/login', (req, res) => {
+//     const errorMessage = req.flash('error').join('<br>');
+//     res.render('login/form', {
+//         errorMessage: errorMessage
+//     });
+// });
+
+// // ログイン実行
+// app.post('/login',
+//     passport.authenticate('local', {
+//         successRedirect: '/user',
+//         failureRedirect: '/login',
+//         failureFlash: true,
+//         badRequestMessage: '「メールアドレス」と「パスワード」は必須入力です。'
+//     })
+// );
+
+// // ログイン成功後のページ
+// app.get('/user', authMiddleware, (req, res) => {
+//     const user = req.user;
+//     res.send('ログイン完了！');
+// });
 
 //// パッケージ読み込み
 // const { check, validationResult } = require('express-validator');

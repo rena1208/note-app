@@ -1,10 +1,5 @@
-// .env読み込み
-require('dotenv').config()
-const express = require('express');
-const app = express();
 
-// mysqlを呼び出す
-const mysql = require('mysql');
+
 
 ////createConnectionで接続するデータベースの情報を格納
 // const connection = mysql.createConnection({
@@ -27,7 +22,8 @@ const nodemailer = require('nodemailer');
 // const app = express()
 
 
-
+// mysqlを呼び出す
+const mysql = require('mysql');
 
 // ルート設定
 //ユーザー登録
