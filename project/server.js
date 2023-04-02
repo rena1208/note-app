@@ -14,6 +14,10 @@ const flash = require('connect-flash');
 const bcrypt = require('bcrypt');
 const passport = require('passport');
 const LocalStrategy = require('passport-local').Strategy;
+const bodyParser = require('body-parser');
+const jwt = require('jsonwebtoken');
+const config = require('./config');
+const authenticate = require('./authenticate');
 // const passport = require('./auth');
 
 app.get('/', function (req, res) {
@@ -22,19 +26,6 @@ app.get('/', function (req, res) {
 app.listen(5000, function () {
     console.log('Example app listening on port http://localhost:5000!')
 })
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 // ミドルウェアの設定
 app.use(express.json());
@@ -48,6 +39,7 @@ app.use(session({
 }));
 app.use(passport.initialize());
 app.use(passport.session());
+app.use(bodyParser.json());
 
 
 const authMiddleware = (req, res, next) => {
@@ -61,17 +53,6 @@ const authMiddleware = (req, res, next) => {
 
     }
 };
-
-
-
-
-// app.get('/register', (request, response) => {
-//     // res.setHeader("Access-Control-Allow-Origin", "*");
-//     return response.json(200);
-
-// });
-
-
 
 //バリデーション
 // バリデーション・ルール
@@ -140,85 +121,56 @@ app.post('/register', registrationValidationRules, (req, res) => {
     });
 });
 
+//ログイン
+app.post('/api/login', (req, res) => {
+    console.log(req.body.email);
+    console.log(req.body.password);
+    // return;
+    const payload = {
 
-// //ログイン
-// passport.use(new LocalStrategy({
-//     usernameField: 'email',
-//     passwordField: 'password'
-// }, (email, password, done) => {
+        email: req.body.email,
+        password: req.body.password
+    };
 
-//     User.findOne({
-//         where: {
-//             email: email
+    const token = jwt.sign(payload, config.jwt.secret);
+
+    const body = {
+        email: req.body.email,
+        token: token,
+    };
+    console.log(body);
+    res.status(200).json(body);
+});
+
+app.get('/api/user', authenticate, (req, res) => {
+
+    console.log(req.jwtPayload);
+    // return;
+    // console.log(res);
+    res.status(200).json({
+        message: 'Hello!',
+        authEmail: req.jwtPayload.email,
+        authPasswoed: req.wtPayload.password,
+    });
+});
+
+// app.get('/api/user/', (req, res) => {
+
+//     const bearToken = req.headers['authorization']
+//     const bearer = bearToken.split(' ')
+//     const token = bearer[1]
+
+//     jwt.verify(token, 'secret', (err, user) => {
+//         if (err) {
+//             return res.sendStatus(403)
+//         } else {
+//             return res.json({
+//                 user
+//             });
 //         }
 //     })
-//         .then(user => {
-
-//             if (user && bcrypt.compareSync(password, user.password)) {
-
-//                 return done(null, user);  // ログイン成功
-
-//             }
-
-//             throw new Error();
-
-//         })
-//         .catch(error => { // エラー処理
-
-//             return done(null, false, { message: '認証情報と一致するレコードがありません。' });
-
-//         });
-
-// }));
-
-// // Session
-// passport.serializeUser((user, done) => {
-
-//     done(null, user);
-
-// });
-// passport.deserializeUser((user, done) => {
-
-//     done(null, user);
-
 // });
 
-// module.exports = passport;
+app.listen(3000, () => console.log('Listening on port 3000...'));
 
-// // ログインフォーム
-// app.get('/login', (req, res) => {
-//     const errorMessage = req.flash('error').join('<br>');
-//     res.render('login/form', {
-//         errorMessage: errorMessage
-//     });
-// });
 
-// // ログイン実行
-// app.post('/login',
-//     passport.authenticate('local', {
-//         successRedirect: '/user',
-//         failureRedirect: '/login',
-//         failureFlash: true,
-//         badRequestMessage: '「メールアドレス」と「パスワード」は必須入力です。'
-//     })
-// );
-
-// // ログイン成功後のページ
-// app.get('/user', authMiddleware, (req, res) => {
-//     const user = req.user;
-//     res.send('ログイン完了！');
-// });
-
-//// パッケージ読み込み
-// const { check, validationResult } = require('express-validator');
-// const nodemailer = require('nodemailer');
-// const bcrypt = require('bcrypt');
-// const crypto = require('crypto');
-// const User = require('./models').User;
-
-// const express = require('express')
-// const app = express()
-
-// // ミドルウェアの設定
-// app.use(express.json());
-// app.use(express.urlencoded({ extended: true }));

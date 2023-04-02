@@ -36,11 +36,12 @@ export default {
   ],
 
   // Modules: https://go.nuxtjs.dev/config-modules
-  modules: [
-    // https://go.nuxtjs.dev/axios
-    "@nuxtjs/axios",
-    // './env.development.js',
-  ],
+  // modules: [
+  //   // https://go.nuxtjs.dev/axios
+  //   "@nuxtjs/axios",
+  //   // './env.development.js',
+
+  // ],
 
   // Axios module configuration: https://go.nuxtjs.dev/config-axios
   axios: {
@@ -72,9 +73,9 @@ export default {
           // autoFetch: true
         },
         endpoints: {
-          login: { url: "/api/login", method: "post" },
+          login: { url: "/api/login", method: "post", propertyName: 'token' },
           logout: { url: "/api/logout", method: "post" },
-          user: { url: "/api/user", method: "get" },
+          user: { url: "/api/user", method: "get", propertyName: 'user' },
         },
       },
     },
