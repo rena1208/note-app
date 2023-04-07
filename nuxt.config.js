@@ -66,7 +66,7 @@ export default {
           property: "token",
           global: true,
           // required: true,
-          // type: 'Bearer'
+          type: 'Bearer'
         },
         user: {
           property: "user",
@@ -85,6 +85,11 @@ export default {
     axios: {
       baseURL: process.env.apiBaseUrl,
     },
+  },
+
+  //ミドルウェア設定
+  router: {
+    middleware: ['auth'],
   },
 
 }
