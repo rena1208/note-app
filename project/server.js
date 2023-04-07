@@ -123,8 +123,8 @@ app.post('/register', registrationValidationRules, (req, res) => {
 
 //ログイン
 app.post('/api/login', (req, res) => {
-    console.log(req.body.email);
-    console.log(req.body.password);
+    // console.log(req.body.email);
+    // console.log(req.body.password);
     // return;
     const payload = {
 
@@ -132,25 +132,33 @@ app.post('/api/login', (req, res) => {
         password: req.body.password
     };
 
-    const token = jwt.sign(payload, config.jwt.secret);
+    const token = jwt.sign(payload, config.jwt.secret, config.jwt.options);
 
     const body = {
         email: req.body.email,
         token: token,
     };
-    console.log(body);
+    // console.log(body);
     res.status(200).json(body);
 });
 
 app.get('/api/user', authenticate, (req, res) => {
 
-    console.log(req.jwtPayload);
+    // const bearToken = req.headers['authorization']
+    // const bearer = bearToken.split(' ')
+    // const token = bearer[1]
+    // console.log(req.jwtPayload);
     // return;
-    // console.log(res);
+    // console.log(res.status(200).json);
     res.status(200).json({
-        message: 'Hello!',
-        authEmail: req.jwtPayload.email,
-        authPasswoed: req.wtPayload.password,
+
+        // message: 'Hello!',
+        // authEmail: req.jwtPayload.email,
+        user: {
+            email: req.jwtPayload.email,
+            name: '名前'
+        }
+
     });
 });
 
@@ -170,6 +178,14 @@ app.get('/api/user', authenticate, (req, res) => {
 //         }
 //     })
 // });
+
+//ログアウト機能
+app.post('/logout', (req, res) => {
+    req.session.destroy(() => {
+        res.clearCookie('connect.sid')
+        res.redirect('/')
+    })
+})
 
 app.listen(3000, () => console.log('Listening on port 3000...'));
 
