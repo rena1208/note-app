@@ -61,12 +61,26 @@ export default {
             password: this.password,
           },
         })
+        console.log(response)
+        const userId = this.$auth.user.id
+        console.log(this.$auth.user)
+        console.log(userId)
+        this.$router.push(`/${userId}/noteindex`)
+        // const userDataRes = await this.$axios.get('/api/user', token)
+
+        // console.log(userDataResponse)
         // // ログイン成功時にリダイレクトする
         // if (response.data.redirect) {
         //   this.$router.push(response.data.redirect)
         // }
-        console.log(response)
-        this.$router.push('/show')
+        // const userDataResponse = await this.axios.get('/api/user', {
+        //   params: userId,
+        // })
+        // const userData = userDataResponse.data
+
+        // return userData.id
+
+        // console.log(userId)
       } catch (err) {
         console.log(err)
       }

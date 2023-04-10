@@ -1,31 +1,29 @@
 <template>
   <section class="conteiner">
-    <body>
-      <h1>ログイン</h1>
-      <form class="box" @submit.prevent>
-        <label for="email"
-          ><dl class="email">
-            <dt>ID</dt>
-            <dd>
-              <input
-                id="email"
-                type="string"
-                v-model="email"
-                placeholder="メールアドレス"
-              />
-            </dd></dl
-        ></label>
-        <label for="password"
-          ><dl>
-            <dt>パスワード</dt>
-            <dd>
-              <input id="password" type="password" v-model="password" />
-            </dd></dl
-        ></label>
+    <h1>ログイン</h1>
+    <form class="box" @submit.prevent>
+      <label for="email"
+        ><dl class="email">
+          <dt>ID</dt>
+          <dd>
+            <input
+              id="email"
+              type="string"
+              v-model="email"
+              placeholder="メールアドレス"
+            />
+          </dd></dl
+      ></label>
+      <label for="password"
+        ><dl>
+          <dt>パスワード</dt>
+          <dd>
+            <input id="password" type="password" v-model="password" />
+          </dd></dl
+      ></label>
 
-        <button type="button" @click.stop="userLogin">ログイン</button>
-      </form>
-    </body>
+      <button type="button" @click.stop="userLogin">ログイン</button>
+    </form>
   </section>
 </template>
 
@@ -44,7 +42,7 @@ export default {
       console.log(this.email)
       console.log(this.password)
       this.$axios
-        .$post('/', {
+        .$post('/login', {
           email: this.email,
           password: this.password,
         })
@@ -68,7 +66,7 @@ export default {
         //   this.$router.push(response.data.redirect)
         // }
         console.log(response)
-        this.$router.push('/show')
+        this.$router.push({ name: `${userId}/noteindex`, params: { userId } })
       } catch (err) {
         console.log(err)
       }
