@@ -5,6 +5,7 @@ require('dotenv').config()
 const { check, validationResult } = require('express-validator');
 const crypto = require('crypto');
 const User = require('./models').User;
+const Note = require('./models').Note;
 const { send } = require('process');
 const express = require('express');
 const app = express();
@@ -142,25 +143,48 @@ app.post('/api/login', (req, res) => {
     res.status(200).json(body);
 });
 
-app.get('/api/user', authenticate, (req, res) => {
-
+app.get('/api/user', authenticate, async (req, res) => {
+    console.log(req.jwtPayload)
     // const bearToken = req.headers['authorization']
     // const bearer = bearToken.split(' ')
     // const token = bearer[1]
     // console.log(req.jwtPayload);
     // return;
     // console.log(res.status(200).json);
+
     res.status(200).json({
 
         // message: 'Hello!',
         // authEmail: req.jwtPayload.email,
         user: {
             email: req.jwtPayload.email,
-            name: '名前'
+            name: '名前',
+
+
         }
 
     });
+
+
 });
+
+app.post('/userId/postnote', (req, res) => {
+    // 送信されたデータ
+    console.log(req.body)
+    const title = req.body.title;
+    const text = req.body.text;
+
+    // postデータを登録
+    Note.create({
+        // where: { email: email },
+        title: title,
+        text: text,
+    }
+    ).then(() => {
+        // console.log(`title: title, text: ${text}`)
+        res.json({ message: 'success' })
+    });
+})
 
 // app.get('/api/user/', (req, res) => {
 
@@ -180,7 +204,7 @@ app.get('/api/user', authenticate, (req, res) => {
 // });
 
 //ログアウト機能
-app.post('/logout', (req, res) => {
+app.post('api/logout', (req, res) => {
     req.session.destroy(() => {
         res.clearCookie('connect.sid')
         res.redirect('/')
